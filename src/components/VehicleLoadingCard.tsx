@@ -1,75 +1,80 @@
 import { Fragment, useState } from 'react'
-import type { Fleet, LoadingAssignment, SalesOrder } from '../types'
-import { fleetTheme, initials } from '../lib/fleetTheme'
+import type { DispatchPlan, SalesOrder, Vehicle } from '../types'
+import { themeForIndex } from '../lib/fleetTheme'
 import { useAppStore } from '../store/AppStore'
 import { StatusPill } from './StatusPill'
+import { Card } from './ui'
 
-const statusLabel: Record<string, { label: string; tone: 'neutral' | 'success' | 'warning' }> = {
-  belum_kirim: { label: 'Belum Kirim', tone: 'neutral' },
-  diterima: { label: 'Diterima', tone: 'success' },
-  retur_sebagian: { label: 'Retur Sebagian', tone: 'warning' },
+const lineStatusMeta = {
+  pending: { label: 'Belum Kirim', tone: 'neutral' as const },
+  received: { label: 'Diterima', tone: 'success' as const },
+  partial_return: { label: 'Retur Sebagian', tone: 'warning' as const },
 }
 
-export function FleetLoadingCard({
-  fleet,
-  assignment,
+export function VehicleLoadingCard({
+  vehicle,
+  index,
+  plan,
   soList,
+  customerNameOf,
 }: {
-  fleet: Fleet
-  assignment: LoadingAssignment
+  vehicle: Vehicle
+  index: number
+  plan: DispatchPlan
   soList: SalesOrder[]
+  customerNameOf: (customerId: string) => string
 }) {
-  const { updateAssignment, departFleet, cancelDeparture, updateSoLine } = useAppStore()
-  const theme = fleetTheme(fleet.type)
+  const { updateDispatch, departVehicle, cancelDeparture, updateSoLine } = useAppStore()
+  const theme = themeForIndex(index)
   const [editingTime, setEditingTime] = useState(false)
-  const [timeDraft, setTimeDraft] = useState(assignment.departedAt ?? '')
+  const [timeDraft, setTimeDraft] = useState(plan.departedAt ?? '')
   const [managementUnlock, setManagementUnlock] = useState(false)
 
   const allLines = soList.flatMap((so) => so.lines)
   const styrofoamTotal = allLines.reduce((s, l) => s + (l.styrofoam ?? 0), 0)
-  const canDepart = assignment.driver.trim().length > 0 && assignment.helper.trim().length > 0
-  const isDeparted = assignment.status === 'berangkat'
+  const canDepart = plan.driver.trim().length > 0 && plan.helper.trim().length > 0
+  const isDeparted = plan.status === 'departed'
   const fieldsLocked = isDeparted && !managementUnlock
 
   return (
-    <div className={`overflow-hidden rounded-xl border-l-4 ${theme.border} bg-white shadow-sm`}>
-      <div className={`${theme.cardBg} p-4`}>
+    <Card className={`overflow-hidden border-l-4 p-0 ${theme.border}`}>
+      <div className="p-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className={`flex h-11 w-11 items-center justify-center rounded-full ${theme.avatarBg} text-sm font-bold text-white`}>
-              {initials(fleet.name)}
+            <div className={`flex h-11 w-11 items-center justify-center rounded-md text-sm font-bold text-white ${theme.chip}`}>
+              {vehicle.name.slice(0, 2)}
             </div>
             <div>
-              <p className="text-lg font-bold text-navy-900">{fleet.name}</p>
-              <p className="text-xs text-slate-500">{soList.length} SO · {fleet.plateNumber}</p>
+              <p className="text-lg font-bold text-ink-900">{vehicle.name}</p>
+              <p className="text-xs text-ink-500">{soList.length} SO · {vehicle.plateNumber} · {plan.routeName}</p>
             </div>
           </div>
           <div className="w-full sm:w-56">
-            <label className="text-xs font-semibold text-slate-500">Driver</label>
+            <label className="text-xs font-semibold text-ink-500">Driver</label>
             <input
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm disabled:bg-slate-100 disabled:text-slate-500"
+              className="mt-1 w-full rounded-md border border-ink-200 bg-white px-3 py-2 text-sm disabled:bg-ink-100 disabled:text-ink-500"
               placeholder="Nama driver"
-              value={assignment.driver}
+              value={plan.driver}
               disabled={fieldsLocked}
-              onChange={(e) => updateAssignment(fleet.id, { driver: e.target.value })}
+              onChange={(e) => updateDispatch(vehicle.id, { driver: e.target.value })}
             />
           </div>
         </div>
 
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
           <div className="w-full sm:max-w-md sm:flex-1">
-            <label className="text-xs font-semibold text-slate-500">Helper</label>
+            <label className="text-xs font-semibold text-ink-500">Helper</label>
             <input
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm disabled:bg-slate-100 disabled:text-slate-500"
+              className="mt-1 w-full rounded-md border border-ink-200 bg-white px-3 py-2 text-sm disabled:bg-ink-100 disabled:text-ink-500"
               placeholder="Nama helper"
-              value={assignment.helper}
+              value={plan.helper}
               disabled={fieldsLocked}
-              onChange={(e) => updateAssignment(fleet.id, { helper: e.target.value })}
+              onChange={(e) => updateDispatch(vehicle.id, { helper: e.target.value })}
             />
           </div>
           {styrofoamTotal > 0 && (
-            <p className="text-sm text-slate-500 shrink-0">
-              Styrofoam: <span className="font-bold text-navy-900">{styrofoamTotal}</span>
+            <p className="shrink-0 text-sm text-ink-500">
+              Styrofoam: <span className="font-bold text-ink-900">{styrofoamTotal}</span>
             </p>
           )}
         </div>
@@ -79,28 +84,28 @@ export function FleetLoadingCard({
             <>
               <button
                 disabled={!canDepart}
-                onClick={() => departFleet(fleet.id, new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }))}
-                className="w-full rounded-lg bg-brand-500 py-2.5 text-sm font-bold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-brand-400/60 sm:w-auto sm:px-6"
+                onClick={() => departVehicle(vehicle.id, new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }))}
+                className="w-full rounded-md bg-signal-600 py-2.5 text-sm font-bold text-white transition hover:bg-signal-700 disabled:cursor-not-allowed disabled:bg-ink-300 sm:w-auto sm:px-6"
               >
                 Armada Berangkat
               </button>
-              {!canDepart && <p className="mt-1.5 text-xs font-semibold text-amber-600">Isi nama driver & helper dulu</p>}
+              {!canDepart && <p className="mt-1.5 text-xs font-semibold text-amber-700">Isi nama driver & helper dulu</p>}
             </>
           ) : (
             <div className="space-y-2.5">
-              <StatusPill tone="success">Berangkat {assignment.departedAt}</StatusPill>
+              <StatusPill tone="success">Berangkat {plan.departedAt}</StatusPill>
               {editingTime ? (
                 <div className="flex items-center gap-2">
                   <input
                     type="time"
-                    className="rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                    className="rounded-md border border-ink-200 px-2 py-1 text-sm"
                     value={timeDraft}
                     onChange={(e) => setTimeDraft(e.target.value)}
                   />
                   <button
-                    className="text-xs font-bold text-brand-600"
+                    className="text-xs font-bold text-signal-700"
                     onClick={() => {
-                      updateAssignment(fleet.id, { departedAt: timeDraft })
+                      updateDispatch(vehicle.id, { departedAt: timeDraft })
                       setEditingTime(false)
                     }}
                   >
@@ -108,19 +113,19 @@ export function FleetLoadingCard({
                   </button>
                 </div>
               ) : (
-                <button className="block text-xs font-semibold text-brand-600 underline underline-offset-2" onClick={() => setEditingTime(true)}>
+                <button className="block text-xs font-semibold text-signal-700 underline underline-offset-2" onClick={() => setEditingTime(true)}>
                   Ubah jam berangkat
                 </button>
               )}
               <button
                 onClick={() => setManagementUnlock((v) => !v)}
-                className="block w-full rounded-lg border border-brand-500 py-2 text-sm font-bold text-brand-600 hover:bg-brand-50"
+                className="block w-full rounded-md border border-signal-600 py-2 text-sm font-bold text-signal-700 hover:bg-signal-50"
               >
                 {managementUnlock ? 'Kunci Kembali' : 'Ubah (Management)'}
               </button>
               <button
-                onClick={() => cancelDeparture(fleet.id)}
-                className="block w-full rounded-lg border border-slate-300 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50"
+                onClick={() => cancelDeparture(vehicle.id)}
+                className="block w-full rounded-md border border-ink-300 py-2 text-sm font-bold text-ink-600 hover:bg-ink-50"
               >
                 ↺ Batalkan Berangkat
               </button>
@@ -129,10 +134,10 @@ export function FleetLoadingCard({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto border-t border-ink-100">
         <table className="w-full min-w-[720px] text-sm">
           <thead>
-            <tr className="border-t border-slate-100 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-wide text-slate-500">
+            <tr className="bg-ink-50 text-left text-[11px] font-bold uppercase tracking-wide text-ink-500">
               <th className="w-8 px-3 py-2"></th>
               <th className="px-3 py-2">Customer / No SO</th>
               <th className="px-3 py-2">Kode SKU</th>
@@ -147,24 +152,24 @@ export function FleetLoadingCard({
             {soList.map((so, soIdx) => (
               <Fragment key={so.id}>
                 {so.lines.map((line, lineIdx) => (
-                  <tr key={line.id} className="border-t border-slate-100 align-top">
+                  <tr key={line.id} className="border-t border-ink-100 align-top">
                     {lineIdx === 0 ? (
-                      <td className="px-3 py-2.5 text-xs text-slate-400" rowSpan={so.lines.length}>
+                      <td className="px-3 py-2.5 text-xs text-ink-400" rowSpan={so.lines.length}>
                         {soIdx + 1}
                       </td>
                     ) : null}
                     {lineIdx === 0 ? (
                       <td className="px-3 py-2.5" rowSpan={so.lines.length}>
-                        <p className="font-bold text-navy-900">{so.customerName}</p>
-                        <p className="text-xs text-slate-400">{so.soNumber}</p>
+                        <p className="font-bold text-ink-900">{customerNameOf(so.customerId)}</p>
+                        <p className="text-xs text-ink-400">{so.soNumber}</p>
                       </td>
                     ) : null}
-                    <td className="px-3 py-2.5 font-mono text-xs text-slate-500">{line.skuCode}</td>
-                    <td className="px-3 py-2.5 text-slate-700">{line.skuName}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs text-ink-500">{line.skuCode}</td>
+                    <td className="px-3 py-2.5 text-ink-700">{line.skuName}</td>
                     <td className="px-3 py-2.5">
                       <input
                         type="number"
-                        className="w-16 rounded-lg border border-slate-300 px-2 py-1.5 text-sm disabled:bg-slate-100"
+                        className="w-16 rounded-md border border-ink-200 px-2 py-1.5 text-sm disabled:bg-ink-100"
                         value={line.qtyKirim}
                         disabled={fieldsLocked}
                         onChange={(e) => updateSoLine(so.id, line.id, { qtyKirim: Number(e.target.value) })}
@@ -173,7 +178,7 @@ export function FleetLoadingCard({
                     <td className="px-3 py-2.5">
                       <input
                         type="number"
-                        className="w-14 rounded-lg border border-slate-300 px-2 py-1.5 text-center text-sm text-slate-400 placeholder:text-slate-300 disabled:bg-slate-100"
+                        className="w-14 rounded-md border border-ink-200 px-2 py-1.5 text-center text-sm text-ink-400 placeholder:text-ink-300 disabled:bg-ink-100"
                         placeholder="—"
                         value={line.keranjang ?? ''}
                         disabled={fieldsLocked}
@@ -183,7 +188,7 @@ export function FleetLoadingCard({
                     <td className="px-3 py-2.5">
                       <input
                         type="number"
-                        className="w-14 rounded-lg border border-slate-300 px-2 py-1.5 text-center text-sm text-slate-400 placeholder:text-slate-300 disabled:bg-slate-100"
+                        className="w-14 rounded-md border border-ink-200 px-2 py-1.5 text-center text-sm text-ink-400 placeholder:text-ink-300 disabled:bg-ink-100"
                         placeholder="—"
                         value={line.styrofoam ?? ''}
                         disabled={fieldsLocked}
@@ -192,7 +197,7 @@ export function FleetLoadingCard({
                     </td>
                     {lineIdx === 0 ? (
                       <td className="px-3 py-2.5" rowSpan={so.lines.length}>
-                        <StatusPill tone={statusLabel[line.statusKirim].tone}>{statusLabel[line.statusKirim].label}</StatusPill>
+                        <StatusPill tone={lineStatusMeta[line.lineStatus].tone}>{lineStatusMeta[line.lineStatus].label}</StatusPill>
                       </td>
                     ) : null}
                   </tr>
@@ -201,14 +206,14 @@ export function FleetLoadingCard({
             ))}
             {soList.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-3 py-6 text-center text-sm text-slate-400">
-                  Belum ada SO yang di-assign ke armada ini. Atur di Route Planner.
+                <td colSpan={8} className="px-3 py-6 text-center text-sm text-ink-400">
+                  Belum ada SO yang di-assign ke armada ini. Atur di Dispatch Planning.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-    </div>
+    </Card>
   )
 }

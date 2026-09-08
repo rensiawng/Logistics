@@ -1,24 +1,42 @@
-# SHB Logistics — Cold Chain Ops Console
+# SHB Ops — Logistics Console
 
-An internal operations web app for SHB's frozen fruit distribution fleet (Thermo, Coldspace, Luxio, Glacia), rebuilt from the existing mobile Loading Plan / Petty Cash screens into a fuller cross-device console.
+An internal logistics operations console for a fresh-produce trading/import-export company (frozen & fresh fruit distribution). Covers the full operational surface end to end: sales orders, dispatch planning, delivery/route tracking, loading plans, drivers & helpers, fleet/vehicles, petty cash, shipment documents, approvals, shipment status, operational alerts, task tracking, and customer/supplier logistics info.
+
+This is a purpose-built redesign — not a visual copy of any reference system. Visual identity: light "control tower" enterprise theme (warm graphite ink palette + a single deep-teal accent), grouped sidebar navigation, rectangular dot-indicator status badges, square vehicle/entity avatars, and dense data tables — deliberately different from soft rounded mobile-card UIs.
 
 ## Stack
 
-React + TypeScript + Vite, Tailwind CSS v4, React Router, Recharts, lucide-react icons. All data is in-memory mock data (`src/data/seed.ts`) wired through a React context store (`src/store/AppStore.tsx`) — no backend yet, everything resets on reload.
+React + TypeScript + Vite, Tailwind CSS v4, React Router, Recharts, lucide-react icons. All data is in-memory mock data (`src/data/`) wired through a React context store (`src/store/AppStore.tsx`) — no backend, state resets on reload.
 
-## Pages
+## Modules
 
-- **Dashboard** — fleet status, KPIs, and an auto-generated attention list (temp excursions, over-budget petty cash, expiring driver licenses).
-- **Route Planner** — assign each Sales Order to an armada for the delivery date.
-- **Loading Plan** — the original screen: per-armada driver/helper entry, qty kirim / keranjang / styrofoam per SKU line, and the Armada Berangkat → Ubah jam berangkat / Ubah (Management) / Batalkan Berangkat flow.
-- **Fleet Tracking** *(new)* — live location, ETA, and a reefer temperature chart per armada with cold-chain excursion alerts.
-- **Petty Cash** — the original screen: Perlu Verifikasi → Siap Refill → Nunggu Approval Finance pipeline, itemized receipts, over-budget flagging.
-- **Drivers** *(new)* — performance scorecards (on-time rate, temp-excursion average, incidents, SIM expiry) to support rotation and bonus decisions.
-- **Reports** *(new)* — on-time delivery trend, petty cash spend vs. budget, SKU volume, and a plain-language weekly insight list.
+**Operations**
+- **Dashboard** — control-tower overview: KPIs, active alerts feed, pending approvals, fleet status, SO status funnel.
+- **Sales Orders** — every SO from draft to POD received, filterable by status, expandable to line items with manual status override.
+- **Dispatch Planning** — assign each SO to a vehicle/route for the delivery date before it enters Loading Plan.
+- **Loading Plan** — per-vehicle driver/helper assignment, qty kirim/keranjang/styrofoam per SKU line, and the Armada Berangkat → Ubah jam berangkat / Ubah (Management) / Batalkan Berangkat flow.
+- **Shipment Tracking** — Kanban board across the full shipment lifecycle plus live vehicle telemetry (location, ETA, reefer temperature chart with cold-chain excursion alerts).
 
-## Why these additions
+**Resources**
+- **Fleet & Vehicles** — master vehicle data: STNK/KIR/insurance expiry, odometer vs. next service threshold.
+- **Drivers & Helpers** — personnel master data and performance scorecards (on-time rate, temp-excursion average, incidents, SIM expiry).
 
-The screenshots showed two screens (Loading Plan, Petty Cash) that assume driver/helper assignment and cash spend are already known — Route Planner closes the gap of *how* SOs get assigned to a truck in the first place. Because the fleet names (Thermo, Coldspace, Luxio) and SKUs are all frozen/chilled fruit product, cold-chain temperature integrity is the highest-leverage efficiency risk that wasn't represented anywhere, so Fleet Tracking adds live reefer temp monitoring and excursion alerts. Drivers and Reports turn the operational data that's already being captured (on-time delivery, petty cash, SO volume) into scorecards and trends that support staffing, budgeting, and routing decisions instead of living only as unreviewed transaction logs.
+**Finance**
+- **Petty Cash** — Perlu Verifikasi → Siap Refill → Nunggu Approval Finance pipeline with itemized receipts and over-budget flagging.
+
+**Compliance**
+- **Documents** — shipment document tracker per SO (DO, invoice, packing list, POD, customs declaration, phytosanitary certificate) with status and due dates.
+- **Approvals** — unified approval queue for petty cash refills, discounts, credit-term exceptions, route changes, and document exceptions.
+
+**Planning**
+- **Tasks** — ops task board (To Do / In Progress / Done) by category, priority, and assignee, linkable to a SO.
+- **Alerts** — every operational alert (cold chain, petty cash, compliance, fleet, SLA) in one place, filterable and resolvable.
+
+**Partners**
+- **Customers & Suppliers** — logistics-relevant partner data: delivery addresses, dock hours, cold-chain requirements, credit terms, incoterms, lead times.
+
+**Insights**
+- **Reports** — on-time delivery trend, petty cash spend vs. budget, document compliance trend, SKU volume, and a plain-language weekly insight list.
 
 ## Run locally
 

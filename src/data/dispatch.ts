@@ -1,0 +1,53 @@
+import type { DispatchPlan } from '../types'
+import { TODAY } from './constants'
+
+export const dispatchPlans: DispatchPlan[] = [
+  {
+    vehicleId: 'veh-ref01',
+    date: TODAY,
+    routeName: 'Jaksel - Karawang AM',
+    stops: ['PT Astro Technologies Indonesia', 'Antony - Jus Aja Karawang'],
+    soIds: ['so1', 'so2'],
+    driver: '',
+    helper: '',
+    status: 'planning',
+    departedAt: null,
+    eta: null,
+  },
+  {
+    vehicleId: 'veh-ref02',
+    date: TODAY,
+    routeName: '-',
+    stops: [],
+    soIds: [],
+    driver: '',
+    helper: '',
+    status: 'planning',
+    departedAt: null,
+    eta: null,
+  },
+  {
+    vehicleId: 'veh-chl01',
+    date: TODAY,
+    routeName: '-',
+    stops: [],
+    soIds: [],
+    driver: '',
+    helper: '',
+    status: 'planning',
+    departedAt: null,
+    eta: null,
+  },
+  {
+    vehicleId: 'veh-dry01',
+    date: TODAY,
+    routeName: 'Jakbar - Tangerang PM',
+    stops: ['PT Quantum Piring Emas', 'Coco Food Indonesia', 'Coco Food Indonesia'],
+    soIds: ['so6', 'so7', 'so8'],
+    driver: 'Handoko Prasetyo',
+    helper: 'Made Suartika',
+    status: 'departed',
+    departedAt: '09:00',
+    eta: '13:30',
+  },
+]

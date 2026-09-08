@@ -1,32 +1,38 @@
 import { Layout } from '../components/Layout'
-import { FleetLoadingCard } from '../components/FleetLoadingCard'
+import { Card } from '../components/ui'
+import { VehicleLoadingCard } from '../components/VehicleLoadingCard'
 import { useAppStore } from '../store/AppStore'
 import { formatDateLong } from '../lib/format'
-import { TODAY } from '../data/seed'
+import { TODAY } from '../data/constants'
 
 export default function LoadingPlan() {
-  const { fleets, assignments, salesOrders } = useAppStore()
+  const { vehicles, dispatchPlans, salesOrders, customers } = useAppStore()
+  const customerNameOf = (id: string) => customers.find((c) => c.id === id)?.name ?? id
 
   return (
-    <Layout title="Loading Plan" subtitle="Isi qty kirim + driver/helper per armada, lalu Save & Lock">
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+    <Layout title="Loading Plan" subtitle="Isi qty kirim, driver/helper per armada, lalu tandai Armada Berangkat">
+      <Card>
         <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-slate-500">Tanggal Kirim</label>
-          <input
-            type="text"
-            readOnly
-            value={formatDateLong(TODAY)}
-            className="w-40 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-medium text-navy-900"
-          />
+          <label className="text-sm font-semibold text-ink-500">Tanggal Kirim</label>
+          <span className="text-sm font-bold text-ink-900">{formatDateLong(TODAY)}</span>
         </div>
-        <p className="mt-1 text-xs text-slate-400">Filter berdasar tanggal kirim yang di-set Route Planner</p>
-      </div>
+        <p className="mt-1 text-xs text-ink-400">Mengikuti tanggal kirim yang ditentukan di Dispatch Planning</p>
+      </Card>
 
       <div className="mt-4 space-y-5">
-        {fleets.map((fleet) => {
-          const assignment = assignments.find((a) => a.fleetId === fleet.id)!
-          const soList = salesOrders.filter((so) => assignment.soIds.includes(so.id))
-          return <FleetLoadingCard key={fleet.id} fleet={fleet} assignment={assignment} soList={soList} />
+        {vehicles.map((vehicle, idx) => {
+          const plan = dispatchPlans.find((d) => d.vehicleId === vehicle.id)!
+          const soList = salesOrders.filter((so) => plan.soIds.includes(so.id))
+          return (
+            <VehicleLoadingCard
+              key={vehicle.id}
+              vehicle={vehicle}
+              index={idx}
+              plan={plan}
+              soList={soList}
+              customerNameOf={customerNameOf}
+            />
+          )
         })}
       </div>
     </Layout>

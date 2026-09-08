@@ -1,0 +1,76 @@
+import type { PettyCashRecap } from '../types'
+
+export const pettyCashRecaps: PettyCashRecap[] = [
+  {
+    id: 'pc1',
+    vehicleId: 'veh-dry01',
+    rit: 1,
+    tanggal: '2026-09-07',
+    picName: 'Handoko Prasetyo',
+    budget: 500000,
+    status: 'perlu_verifikasi',
+    items: [
+      { id: 'i1', label: 'Duta Indah - parkir', category: 'parkir', amount: 6000 },
+      { id: 'i2', label: 'Kuncoran - tol', category: 'tol', amount: 9000 },
+      { id: 'i3', label: 'Tangerang - tol', category: 'tol', amount: 8500 },
+      { id: 'i4', label: 'Kuncoran - tol', category: 'tol', amount: 8500 },
+      { id: 'i5', label: 'Tomang - tol', category: 'tol', amount: 11000 },
+      { id: 'i6', label: 'Semper 1 - tol', category: 'tol', amount: 17000 },
+      { id: 'i7', label: 'Isi BBM Solar', category: 'bbm', amount: 559500 },
+    ],
+  },
+  {
+    id: 'pc2',
+    vehicleId: 'veh-ref01',
+    rit: 1,
+    tanggal: '2026-09-06',
+    picName: 'Iwan Kurniawan',
+    budget: 400000,
+    status: 'nunggu_approval',
+    items: [
+      { id: 'i8', label: 'BBM Pertamina Cawang', category: 'bbm', amount: 350000 },
+      { id: 'i9', label: 'Cikampek - tol', category: 'tol', amount: 32000 },
+      { id: 'i10', label: 'Makan siang tim', category: 'lainnya', amount: 45000 },
+    ],
+  },
+  {
+    id: 'pc3',
+    vehicleId: 'veh-chl01',
+    rit: 2,
+    tanggal: '2026-09-06',
+    picName: 'Bayu Saputra',
+    budget: 400000,
+    status: 'nunggu_approval',
+    items: [
+      { id: 'i11', label: 'Parkir Kuningan', category: 'parkir', amount: 15000 },
+      { id: 'i12', label: 'Bekasi Timur - tol', category: 'tol', amount: 14500 },
+      { id: 'i13', label: 'BBM Shell MT Haryono', category: 'bbm', amount: 380726 },
+    ],
+  },
+  {
+    id: 'pc4',
+    vehicleId: 'veh-ref02',
+    rit: 1,
+    tanggal: '2026-09-05',
+    picName: 'Deni Ramadhan',
+    budget: 400000,
+    status: 'nunggu_approval',
+    items: [
+      { id: 'i14', label: 'BBM Pertamina Kalimalang', category: 'bbm', amount: 340000 },
+      { id: 'i15', label: 'Cibitung - tol', category: 'tol', amount: 21500 },
+    ],
+  },
+  {
+    id: 'pc5',
+    vehicleId: 'veh-dry01',
+    rit: 4,
+    tanggal: '2026-08-30',
+    picName: 'Handoko Prasetyo',
+    budget: 400000,
+    status: 'selesai',
+    items: [
+      { id: 'i16', label: 'BBM Pertamina Kalideres', category: 'bbm', amount: 310000 },
+      { id: 'i17', label: 'Merak - tol', category: 'tol', amount: 41000 },
+    ],
+  },
+]
